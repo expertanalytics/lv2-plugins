@@ -39,6 +39,17 @@ connect_port(LV2_Handle instance,
              uint32_t   port,
              void*      data)
 {
+    SimpleDelay* delay = (SimpleDelay*)instance;
+
+    switch ((PortIndex)port) {
+        case AMP_INPUT:
+            delay->input = (const float*)data;
+            break;
+        case AMP_OUTPUT:
+            delay->output = (float*)data;
+            break;
+    }
+
 }
 
 static void
