@@ -60,6 +60,15 @@ activate(LV2_Handle instance)
 static void
 run(LV2_Handle instance, uint32_t n_samples)
 {
+    SimpleDelay* delay = (SimpleDelay*)instance;
+
+    const float* const input  = delay->input;
+    float* const       output = delay->output;
+
+    for (uint32_t pos = 0; pos < n_samples; pos++) {
+        output[pos] = input[pos];
+    }
+
 }
 
 static void
