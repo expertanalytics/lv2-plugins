@@ -20,6 +20,8 @@ typedef struct {
     const float* input;
     float*       output;
     float*       delay_line1;
+    long         buffer_size;
+    int          input_pos;
 } SimpleDelay;
 
 
@@ -30,6 +32,9 @@ instantiate(const LV2_Descriptor*     descriptor,
             const LV2_Feature* const* features)
 {
     SimpleDelay* simple_delay = (SimpleDelay*)calloc(1, sizeof(SimpleDelay));
+    simple_delay->buffer_size = 26500;
+    simple_delay->delay_line1 = malloc(26500*sizeof(float));
+    simple_delay->input_pos = 0;
 
     return (LV2_Handle)simple_delay;
 }
@@ -66,11 +71,18 @@ run(LV2_Handle instance, uint32_t n_samples)
     const float* const input  = delay->input;
     float* const       delay_line1 = delay->delay_line1;
     float* const       output = delay->output;
+    int                input_pos = delay->input_pos;
+    long const         buffer_size = delay->buffer_size;
+
+    int delay_pos;
 
     for (uint32_t pos = 0; pos < n_samples; pos++) {
-        output[pos] = input[pos]+delay_line1[pos];
-        delay_line1[pos] = input[pos];
+        delay_pos = (pos+input_pos)%buffer_size;
+        output[pos] = input[pos]+delay_line1[delay_pos];
+        delay_line1[delay_pos] = input[pos];
     }
+    input_pos += n_samples;
+    input_pos %= buffer_size;
 
 }
 
@@ -82,7 +94,9 @@ deactivate(LV2_Handle instance)
 static void
 cleanup(LV2_Handle instance)
 {
-    free(instance);
+    SimpleDelay* delay = (SimpleDelay*)instance;
+    free(delay->delay_line1);
+    free(delay);
 }
 
 static const void*
