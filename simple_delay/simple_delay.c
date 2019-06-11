@@ -86,6 +86,8 @@ run(LV2_Handle instance, uint32_t n_samples)
     int delay_pos_input;
     float dry_amount = 0.8;
     float wet_amount = 0.6;
+    float decay = 0.4 // number between 0 and 1
+
     float delay_signal;
     float y1;
     float y2;
@@ -113,7 +115,7 @@ run(LV2_Handle instance, uint32_t n_samples)
         //delay_signal = y1;
         output[pos] = (dry_amount * input[pos] + wet_amount * delay_signal)/(dry_amount+wet_amount);
 
-        delay_line1[delay_pos_input] = input[pos];
+        delay_line1[delay_pos_input] = input[pos] + decay * output[pos];
     }
     input_pos += n_samples;
     input_pos %= buffer_size;
