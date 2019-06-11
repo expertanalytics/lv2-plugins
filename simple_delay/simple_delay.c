@@ -4,6 +4,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "lv2/lv2plug.in/ns/lv2core/lv2.h"
 #define SIMPLE_DELAY_URI "https://github.com/expertanalytics/lv2-plugins/tree/master/simple_delay"
@@ -11,7 +12,8 @@
 
 typedef enum {
     AMP_INPUT  = 0,
-    AMP_OUTPUT = 1
+    AMP_OUTPUT = 1,
+    AMP_DELAY_TIME = 2
 } PortIndex;
 
 
@@ -22,6 +24,7 @@ typedef struct {
     float*       delay_line1;
     long         buffer_size;
     int          input_pos;
+    const float* delay_time;
 } SimpleDelay;
 
 
@@ -31,9 +34,10 @@ instantiate(const LV2_Descriptor*     descriptor,
             const char*               bundle_path,
             const LV2_Feature* const* features)
 {
+    printf("instantiate\n");
     SimpleDelay* simple_delay = (SimpleDelay*)calloc(1, sizeof(SimpleDelay));
-    simple_delay->buffer_size = 26500;
-    simple_delay->delay_line1 = malloc(26500*sizeof(float));
+    simple_delay->buffer_size = 22050*2;
+    simple_delay->delay_line1 = malloc(((int)simple_delay->buffer_size)*sizeof(float));
     simple_delay->input_pos = 0;
 
     return (LV2_Handle)simple_delay;
@@ -46,7 +50,6 @@ connect_port(LV2_Handle instance,
              void*      data)
 {
     SimpleDelay* delay = (SimpleDelay*)instance;
-
     switch ((PortIndex)port) {
         case AMP_INPUT:
             delay->input = (const float*)data;
@@ -54,6 +57,9 @@ connect_port(LV2_Handle instance,
         case AMP_OUTPUT:
             delay->output = (float*)data;
             break;
+        case AMP_DELAY_TIME:
+            printf("Connect ports: index %zu \n", port);
+            delay->delay_time = (const float*)data;
     }
 
 }
@@ -61,6 +67,7 @@ connect_port(LV2_Handle instance,
 static void
 activate(LV2_Handle instance)
 {
+    printf("activating\n");
 }
 
 static void
@@ -73,27 +80,47 @@ run(LV2_Handle instance, uint32_t n_samples)
     float* const       output = delay->output;
     int                input_pos = delay->input_pos;
     long const         buffer_size = delay->buffer_size;
+    const float        delay_time = *(delay->delay_time); // s
 
-    int delay_pos;
+
+    int delay_pos_input;
+    int delay_pos_ouput;
+    float dry_amount = 0.8;
+    float wet_amount = 0.6;
+
+    int sample_rate = 44100; // Hz
+
+    int delayed_pos = (input_pos-(int)(delay_time*sample_rate))%buffer_size;
+    if (delayed_pos < 0) {
+        delayed_pos += buffer_size;
+    }
+    //printf("%d - %d\n", delayed_pos, input_pos);
+
 
     for (uint32_t pos = 0; pos < n_samples; pos++) {
-        delay_pos = (pos+input_pos)%buffer_size;
-        output[pos] = input[pos]+delay_line1[delay_pos];
-        delay_line1[delay_pos] = input[pos];
+        delay_pos_input = (pos + input_pos) % buffer_size;
+        delay_pos_ouput = (pos + delayed_pos) % buffer_size;
+
+        delay_line1[delay_pos_input] = input[pos];
+        output[pos] = (dry_amount * input[pos] + wet_amount * delay_line1[delay_pos_ouput])/(dry_amount+wet_amount);
+
     }
     input_pos += n_samples;
     input_pos %= buffer_size;
+    delay->input_pos = input_pos;
 
 }
 
 static void
 deactivate(LV2_Handle instance)
 {
+    printf("deactivate\n");
 }
 
 static void
 cleanup(LV2_Handle instance)
 {
+    printf("cleaning up\n");
     SimpleDelay* delay = (SimpleDelay*)instance;
     free(delay->delay_line1);
     free(delay);
