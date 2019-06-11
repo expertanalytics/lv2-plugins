@@ -84,10 +84,11 @@ run(LV2_Handle instance, uint32_t n_samples)
 
 
     int delay_pos_input;
-    int delay_pos_ouput;
     float dry_amount = 0.8;
     float wet_amount = 0.6;
-    float delay;
+    float delay_signal;
+    float y1;
+    float y2;
 
     int sample_rate = 44100; // Hz
 
@@ -95,9 +96,9 @@ run(LV2_Handle instance, uint32_t n_samples)
     if (delayed_pos < 0) {
         delayed_pos += buffer_size;
     }
-    int x1 = int(delayed_pos);
+    int x1 = (int)delayed_pos;
     int x2 = (x1+1)%buffer_size;
-    float lam = delayed_pos - x1;
+    float lam = x2-delayed_pos;
     //printf("%d - %d\n", delayed_pos, input_pos);
 
 
@@ -107,11 +108,11 @@ run(LV2_Handle instance, uint32_t n_samples)
 
         delay_line1[delay_pos_input] = input[pos];
 
+        y1 = delay_line1[(x1+pos)%buffer_size];
+        y2 = delay_line1[(x2+pos)%buffer_size];
+        delay_signal = y2 + lam*(y1-y2);
 
-        delay = (1-lam)*delay_line1[x1]+lam*delay_line1[x2];
-
-        delay_pos_ouput_ = (pos + delayed_pos) % buffer_size;
-        output[pos] = (dry_amount * input[pos] + wet_amount * delay/(dry_amount+wet_amount);
+        output[pos] = (dry_amount * input[pos] + wet_amount * delay_signal)/(dry_amount+wet_amount);
 
     }
     input_pos += n_samples;
