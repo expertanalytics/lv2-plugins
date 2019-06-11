@@ -106,14 +106,14 @@ run(LV2_Handle instance, uint32_t n_samples)
         delay_pos_input = (pos + input_pos) % buffer_size;
 
 
-        delay_line1[delay_pos_input] = input[pos];
 
         y1 = delay_line1[(x1+pos)%buffer_size];
         y2 = delay_line1[(x2+pos)%buffer_size];
         delay_signal = y2 + lam*(y1-y2);
-
+        //delay_signal = y1;
         output[pos] = (dry_amount * input[pos] + wet_amount * delay_signal)/(dry_amount+wet_amount);
 
+        delay_line1[delay_pos_input] = input[pos];
     }
     input_pos += n_samples;
     input_pos %= buffer_size;
