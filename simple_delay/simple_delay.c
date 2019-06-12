@@ -11,9 +11,12 @@
 
 
 typedef enum {
-    AMP_INPUT  = 0,
-    AMP_OUTPUT = 1,
-    AMP_DELAY_TIME = 2
+    INPUT_PORT  = 0,
+    OUTPUT_PORT = 1,
+    DELAY_TIME_PORT = 2,
+    FEEDBACK_PORT = 3,
+    DRY_PORT = 4,
+    WET_PORT = 5
 } PortIndex;
 
 
@@ -25,6 +28,9 @@ typedef struct {
     long         buffer_size;
     int          input_pos;
     const float* delay_time;
+    const float* feedback;
+    const float* dry_amount;
+    const float* wet_amount;
 } SimpleDelay;
 
 
@@ -51,15 +57,24 @@ connect_port(LV2_Handle instance,
 {
     SimpleDelay* delay = (SimpleDelay*)instance;
     switch ((PortIndex)port) {
-        case AMP_INPUT:
+        case INPUT_PORT:
             delay->input = (const float*)data;
             break;
-        case AMP_OUTPUT:
+        case OUTPUT_PORT:
             delay->output = (float*)data;
             break;
-        case AMP_DELAY_TIME:
+        case DELAY_TIME_PORT:
             printf("Connect ports: index %zu \n", port);
             delay->delay_time = (const float*)data;
+        case FEEDBACK_PORT:
+            printf("Connect ports: index %zu \n", port);
+            delay->feedback = (const float*)data;
+        case DRY_PORT:
+            printf("Connect ports: index %zu \n", port);
+            delay->dry_amount = (const float*)data;
+        case WET_PORT:
+            printf("Connect ports: index %zu \n", port);
+            delay->wet_amount = (const float*)data;
     }
 
 }
@@ -82,16 +97,14 @@ run(LV2_Handle instance, uint32_t n_samples)
     long const         buffer_size = delay->buffer_size;
     const float        delay_time = *(delay->delay_time); // s
 
+    const float        dry_amount = *(delay->dry_amount)/100.;
+    const float        wet_amount = *(delay->wet_amount)/100.;
+    const float        feedback = *(delay->feedback)/100.;
 
     int delay_pos_input;
-    float dry_amount = 0.8;
-    float wet_amount = 0.6;
-    float decay = 0.4 // number between 0 and 1
-
     float delay_signal;
     float y1;
     float y2;
-
     int sample_rate = 44100; // Hz
 
     float delayed_pos = (input_pos-(delay_time*sample_rate));
@@ -101,7 +114,7 @@ run(LV2_Handle instance, uint32_t n_samples)
     int x1 = (int)delayed_pos;
     int x2 = (x1+1)%buffer_size;
     float lam = x2-delayed_pos;
-    //printf("%d - %d\n", delayed_pos, input_pos);
+    printf("%f - %f\n", feedback, dry_amount);
 
 
     for (uint32_t pos = 0; pos < n_samples; pos++) {
@@ -115,7 +128,7 @@ run(LV2_Handle instance, uint32_t n_samples)
         //delay_signal = y1;
         output[pos] = (dry_amount * input[pos] + wet_amount * delay_signal)/(dry_amount+wet_amount);
 
-        delay_line1[delay_pos_input] = input[pos] + decay * output[pos];
+        delay_line1[delay_pos_input] = input[pos] + feedback * output[pos];
     }
     input_pos += n_samples;
     input_pos %= buffer_size;

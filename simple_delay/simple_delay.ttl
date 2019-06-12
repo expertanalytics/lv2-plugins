@@ -13,25 +13,62 @@
         doap:name "Simple delay" ,
                     "Simple delay"@en-gb;
         doap:license <http://opensource.org/licenses/isc> ;
-        lv2:port [ a lv2:AudioPort ,
+        lv2:port [
+                   # Input audio port
+                    a lv2:AudioPort ,
                     lv2:InputPort ;
                     lv2:index 0 ;
                     lv2:symbol "in" ;
                     lv2:name "In"
                     ] , [
+                    # Output Audio Port
                     a lv2:AudioPort ,
                     lv2:OutputPort ;
                     lv2:index 1 ;
                     lv2:symbol "out" ;
                     lv2:name "Out"
                     ] , [
+                    # delay time port
                     a lv2:InputPort ,
                     lv2:ControlPort ;
                     lv2:index 2 ;
                     lv2:symbol "gain" ;
-                    lv2:name "Delay_time";
+                    lv2:name "Delay time";
                     lv2:default 0.2 ;
                     lv2:minimum 0.0 ;
                     lv2:maximum 1.0 ;
                     units:unit units:s ;
-                     ].
+                     ] , [
+                    # feedback port
+                    a lv2:InputPort ,
+                    lv2:ControlPort ;
+                    lv2:index 3 ;
+                    lv2:symbol "gain" ;
+                    lv2:name "Feedback";
+                    lv2:default 0.0 ;
+                    lv2:minimum 0.0 ;
+                    lv2:maximum 100.0 ;
+                    units:unit units:pct ;
+                    ], [
+                     # dry amount port
+                     a lv2:InputPort ,
+                     lv2:ControlPort ;
+                     lv2:index 4 ;
+                     lv2:symbol "gain" ;
+                     lv2:name "Dry Amount";
+                     lv2:default 40 ;
+                     lv2:minimum 0.0 ;
+                     lv2:maximum 100.0 ;
+                     units:unit units:pct ;
+                      ], [
+                    # wet amount port
+                    a lv2:InputPort ,
+                    lv2:ControlPort ;
+                    lv2:index 5 ;
+                    lv2:symbol "gain" ;
+                    lv2:name "Wet amount";
+                    lv2:default 40 ;
+                    lv2:minimum 0.0 ;
+                    lv2:maximum 100.0 ;
+                    units:unit units:pct ;
+                    ].
