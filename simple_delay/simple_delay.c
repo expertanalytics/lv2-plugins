@@ -82,7 +82,13 @@ connect_port(LV2_Handle instance,
 static void
 activate(LV2_Handle instance)
 {
-    printf("activating\n");
+    SimpleDelay* delay = (SimpleDelay*)instance;
+    long const         buffer_size = delay->buffer_size;
+    float* const       delay_line1 = delay->delay_line1;
+    for(uint32_t i = 0; i < buffer_size; i++){
+        delay_line1[i] = 0;
+    }
+ //   printf("activating\n");
 }
 
 
@@ -103,11 +109,7 @@ run(LV2_Handle instance, uint32_t n_samples)
     const float        dry_wet_amount = *(delay->dry_wet_amount)/100.;
     const float        feedback = *(delay->feedback)/100.;
 
-    const float        output_gain_db = *(delay->output_gain);
-
     const float        output_gain = DB_CO(*(delay->output_gain));
-
-    printf("output gain coeff: %f db: %f \n", output_gain, output_gain_db);
 
     int delay_pos_input;
     float delay_signal;
@@ -127,8 +129,6 @@ run(LV2_Handle instance, uint32_t n_samples)
     for (uint32_t pos = 0; pos < n_samples; pos++) {
         delay_pos_input = (pos + input_pos) % buffer_size;
 
-
-
         y1 = delay_line1[(x1+pos)%buffer_size];
         y2 = delay_line1[(x2+pos)%buffer_size];
         delay_signal = y2 + lam*(y1-y2);
@@ -146,13 +146,13 @@ run(LV2_Handle instance, uint32_t n_samples)
 static void
 deactivate(LV2_Handle instance)
 {
-    printf("deactivate\n");
+   // printf("deactivate\n");
 }
 
 static void
 cleanup(LV2_Handle instance)
 {
-    printf("cleaning up\n");
+    //printf("cleaning up\n");
     SimpleDelay* delay = (SimpleDelay*)instance;
     free(delay->delay_line1);
     free(delay);
