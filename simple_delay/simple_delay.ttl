@@ -50,25 +50,25 @@
                     lv2:maximum 100.0 ;
                     units:unit units:pct ;
                     ], [
-                     # dry amount port
+                     # dry / wet amount port
                      a lv2:InputPort ,
                      lv2:ControlPort ;
                      lv2:index 4 ;
                      lv2:symbol "gain" ;
-                     lv2:name "Dry Amount";
+                     lv2:name "Dry Wet Amount";
                      lv2:default 40 ;
                      lv2:minimum 0.0 ;
                      lv2:maximum 100.0 ;
                      units:unit units:pct ;
                       ], [
-                    # wet amount port
+                    # output gain
                     a lv2:InputPort ,
                     lv2:ControlPort ;
                     lv2:index 5 ;
                     lv2:symbol "gain" ;
-                    lv2:name "Wet amount";
-                    lv2:default 40 ;
-                    lv2:minimum 0.0 ;
-                    lv2:maximum 100.0 ;
-                    units:unit units:pct ;
+                    lv2:name "Output gain";
+                    lv2:default 0.0 ;
+                    lv2:minimum -90.0 ;
+                    lv2:maximum 12.0 ;
+                    units:unit units:db ;
                     ].

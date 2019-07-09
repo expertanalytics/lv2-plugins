@@ -15,8 +15,8 @@ typedef enum {
     OUTPUT_PORT = 1,
     DELAY_TIME_PORT = 2,
     FEEDBACK_PORT = 3,
-    DRY_PORT = 4,
-    WET_PORT = 5
+    DRY_WET_PORT = 4,
+    OUTPUT_GAIN = 5,
 } PortIndex;
 
 
@@ -29,8 +29,8 @@ typedef struct {
     int          input_pos;
     const float* delay_time;
     const float* feedback;
-    const float* dry_amount;
-    const float* wet_amount;
+    const float* dry_wet_amount;
+    const float* output_gain;
 } SimpleDelay;
 
 
@@ -69,12 +69,12 @@ connect_port(LV2_Handle instance,
         case FEEDBACK_PORT:
             printf("Connect ports: index %zu \n", port);
             delay->feedback = (const float*)data;
-        case DRY_PORT:
+        case DRY_WET_PORT:
             printf("Connect ports: index %zu \n", port);
-            delay->dry_amount = (const float*)data;
-        case WET_PORT:
+            delay->dry_wet_amount = (const float*)data;
+        case OUTPUT_GAIN:
             printf("Connect ports: index %zu \n", port);
-            delay->wet_amount = (const float*)data;
+            delay->output_gain = (const float*)data;
     }
 
 }
@@ -84,6 +84,9 @@ activate(LV2_Handle instance)
 {
     printf("activating\n");
 }
+
+
+#define DB_CO(g) ((g) > -90.0f ? powf(10.0f, (g) * 0.05f) : 0.0f)
 
 static void
 run(LV2_Handle instance, uint32_t n_samples)
@@ -97,9 +100,14 @@ run(LV2_Handle instance, uint32_t n_samples)
     long const         buffer_size = delay->buffer_size;
     const float        delay_time = *(delay->delay_time); // s
 
-    const float        dry_amount = *(delay->dry_amount)/100.;
-    const float        wet_amount = *(delay->wet_amount)/100.;
+    const float        dry_wet_amount = *(delay->dry_wet_amount)/100.;
     const float        feedback = *(delay->feedback)/100.;
+
+    const float        output_gain_db = *(delay->output_gain);
+
+    const float        output_gain = DB_CO(*(delay->output_gain));
+
+    printf("output gain coeff: %f db: %f \n", output_gain, output_gain_db);
 
     int delay_pos_input;
     float delay_signal;
@@ -114,7 +122,6 @@ run(LV2_Handle instance, uint32_t n_samples)
     int x1 = (int)delayed_pos;
     int x2 = (x1+1)%buffer_size;
     float lam = x2-delayed_pos;
-    printf("%f - %f\n", feedback, dry_amount);
 
 
     for (uint32_t pos = 0; pos < n_samples; pos++) {
@@ -126,8 +133,8 @@ run(LV2_Handle instance, uint32_t n_samples)
         y2 = delay_line1[(x2+pos)%buffer_size];
         delay_signal = y2 + lam*(y1-y2);
         //delay_signal = y1;
-        output[pos] = (dry_amount * input[pos] + wet_amount * delay_signal)/(dry_amount+wet_amount);
-
+        output[pos] = output_gain * (input[pos] * (1.-dry_wet_amount) + dry_wet_amount * delay_signal);
+        // output_gain
         delay_line1[delay_pos_input] = input[pos] + feedback * output[pos];
     }
     input_pos += n_samples;
