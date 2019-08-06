@@ -104,7 +104,7 @@ run(LV2_Handle instance, uint32_t n_samples)
     float* const       output = delay->output;
     int                input_pos = delay->input_pos;
     long const         buffer_size = delay->buffer_size;
-    const float        delay_time = fabs(*(delay->delay_time)); // s
+    const float        delay_time = fabs(*(delay->delay_time))/1000.f; // ms
 
     const float        dry_wet_amount = fabs(*(delay->dry_wet_amount)/100.);
     const float        feedback = fabs(*(delay->feedback)/100.);
