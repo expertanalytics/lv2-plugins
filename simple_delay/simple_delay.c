@@ -64,16 +64,16 @@ connect_port(LV2_Handle instance,
             delay->output = (float*)data;
             break;
         case DELAY_TIME_PORT:
-            printf("Connect ports: index %zu \n", port);
+            printf("Connect ports: index %u \n", port);
             delay->delay_time = (const float*)data;
         case FEEDBACK_PORT:
-            printf("Connect ports: index %zu \n", port);
+            printf("Connect ports: index %u \n", port);
             delay->feedback = (const float*)data;
         case DRY_WET_PORT:
-            printf("Connect ports: index %zu \n", port);
+            printf("Connect ports: index %u \n", port);
             delay->dry_wet_amount = (const float*)data;
         case OUTPUT_GAIN:
-            printf("Connect ports: index %zu \n", port);
+            printf("Connect ports: index %u \n", port);
             delay->output_gain = (const float*)data;
     }
 
