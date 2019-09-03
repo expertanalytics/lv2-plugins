@@ -131,11 +131,11 @@ run(LV2_Handle instance, uint32_t n_samples)
     int x2 = (x1+1)%buffer_size;
     float lam = x2-delayed_pos;
     float step = 1.f/n_samples; // s
-    const float dt = step * (delay_time - current_delay_time);
+    const float dt = 0.000005; //step * (delay_time - current_delay_time);
 
 
     if (fabs(current_delay_time - delay_time) > 0.0001) {
-        printf("Inside loop: delay time old: %f  - delay time new: %f - dt %f \n", current_delay_time, delay_time, dt);
+        printf("Inside loop: delay time old: %f  - delay time new: %f - steps %f \n", current_delay_time, delay_time, dt*n_samples);
     }
     for (uint32_t pos = 0; pos < n_samples; pos++) {
         delay_pos_input = (pos + input_pos) % buffer_size;
@@ -150,14 +150,16 @@ run(LV2_Handle instance, uint32_t n_samples)
         delay_line1[delay_pos_input] = input[pos] + feedback * output[pos];
 
         // recalculate delay buffer positions
-        current_delay_time = current_delay_time + dt;
-        delayed_pos = (input_pos-(current_delay_time*sample_rate));
-        if (delayed_pos < 0) {
-            delayed_pos += buffer_size;
+        if (fabs(current_delay_time - delay_time) > dt) {
+            current_delay_time = current_delay_time + dt;
+            delayed_pos = (input_pos-(current_delay_time*sample_rate));
+            if (delayed_pos < 0) {
+                delayed_pos += buffer_size;
+            }
+            x1 = (int)delayed_pos;
+            x2 = (x1+1)%buffer_size;
+            lam = x2-delayed_pos;
         }
-        x1 = (int)delayed_pos;
-        x2 = (x1+1)%buffer_size;
-        lam = x2-delayed_pos;
     }
     input_pos += n_samples;
     input_pos %= buffer_size;
