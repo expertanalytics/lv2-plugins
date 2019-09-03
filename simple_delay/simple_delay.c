@@ -131,7 +131,7 @@ run(LV2_Handle instance, uint32_t n_samples)
     int x2 = (x1+1)%buffer_size;
     float lam = x2-delayed_pos;
     float step = 1.f/n_samples; // s
-    const float dt = 0.000005; //step * (delay_time - current_delay_time);
+    const float dt = 0.000005 * (delay_time - current_delay_time)/fabs(delay_time - current_delay_time) ; //step * (delay_time - current_delay_time);
 
 
     if (fabs(current_delay_time - delay_time) > 0.0001) {
