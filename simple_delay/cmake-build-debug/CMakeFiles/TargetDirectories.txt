@@ -1,0 +1,7 @@
+/Users/trygvonometri/Documents/lv2-plugins/simple_delay/cmake-build-debug/CMakeFiles/install/local.dir
+/Users/trygvonometri/Documents/lv2-plugins/simple_delay/cmake-build-debug/CMakeFiles/install/strip.dir
+/Users/trygvonometri/Documents/lv2-plugins/simple_delay/cmake-build-debug/CMakeFiles/install.dir
+/Users/trygvonometri/Documents/lv2-plugins/simple_delay/cmake-build-debug/CMakeFiles/list_install_components.dir
+/Users/trygvonometri/Documents/lv2-plugins/simple_delay/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/trygvonometri/Documents/lv2-plugins/simple_delay/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/trygvonometri/Documents/lv2-plugins/simple_delay/cmake-build-debug/CMakeFiles/simple_delay.dir

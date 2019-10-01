@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/trygvonometri/Documents/lv2-plugins/simple_delay/simple_delay.c
+math.h
+-
+stdlib.h
+-
+stdio.h
+-
+lv2/lv2plug.in/ns/lv2core/lv2.h
+-
+
