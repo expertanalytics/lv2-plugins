@@ -28,10 +28,12 @@ typedef struct {
     long         buffer_size;
     int          input_pos;
     const float* delay_time;
+    float current_delay_time;
     const float* feedback;
     const float* dry_wet_amount;
     const float* output_gain;
     double rate;
+    float gamma_delay_time;
 } SimpleDelay;
 
 
@@ -41,13 +43,14 @@ instantiate(const LV2_Descriptor*     descriptor,
             const char*               bundle_path,
             const LV2_Feature* const* features)
 {
-    printf("instantiate\n");
+    // printf("instantiate\n");
     SimpleDelay* simple_delay = (SimpleDelay*)calloc(1, sizeof(SimpleDelay));
     simple_delay->buffer_size = rate * 8.0;
     simple_delay->delay_line1 = malloc(((int)simple_delay->buffer_size)*sizeof(float));
     simple_delay->input_pos = 0;
     simple_delay->rate = rate;
-
+    simple_delay->current_delay_time = 0.02;
+    simple_delay->gamma_delay_time = 0.5/1000.;
     return (LV2_Handle)simple_delay;
 }
 
@@ -66,16 +69,16 @@ connect_port(LV2_Handle instance,
             delay->output = (float*)data;
             break;
         case DELAY_TIME_PORT:
-            printf("Connect ports: index %u \n", port);
+            // printf("Connect ports: index %u \n", port);
             delay->delay_time = (const float*)data;
         case FEEDBACK_PORT:
-            printf("Connect ports: index %u \n", port);
+            // printf("Connect ports: index %u \n", port);
             delay->feedback = (const float*)data;
         case DRY_WET_PORT:
-            printf("Connect ports: index %u \n", port);
+            // printf("Connect ports: index %u \n", port);
             delay->dry_wet_amount = (const float*)data;
         case OUTPUT_GAIN:
-            printf("Connect ports: index %u \n", port);
+            // printf("Connect ports: index %u \n", port);
             delay->output_gain = (const float*)data;
     }
 
@@ -106,9 +109,11 @@ run(LV2_Handle instance, uint32_t n_samples)
     float* const       output = delay->output;
     int                input_pos = delay->input_pos;
     long const         buffer_size = delay->buffer_size;
-    const float        delay_time = fabs(*(delay->delay_time))/1000.f; // ms
 
-    const float        dry_wet_amount = fabs(*(delay->dry_wet_amount)/100.);
+    const float        delay_time = fabs(*(delay->delay_time))/1000.f; // ms -> s
+    float              current_delay_time = delay->current_delay_time; // s
+    const float        gamma_delay_time = delay->gamma_delay_time;
+    float              dry_wet_amount = fabs(*(delay->dry_wet_amount)/100.);
     const float        feedback = fabs(*(delay->feedback)/100.);
 
     const float        output_gain = DB_CO(*(delay->output_gain));
@@ -119,30 +124,32 @@ run(LV2_Handle instance, uint32_t n_samples)
     float y2;
     int sample_rate = (int)delay->rate; // Hz
 
-    float delayed_pos = (input_pos-(delay_time*sample_rate));
-    if (delayed_pos < 0) {
-        delayed_pos += buffer_size;
-    }
-    int x1 = (int)delayed_pos;
-    int x2 = (x1+1)%buffer_size;
-    float lam = x2-delayed_pos;
-
-
     for (uint32_t pos = 0; pos < n_samples; pos++) {
-        delay_pos_input = (pos + input_pos) % buffer_size;
+        // calculate delay time if it was changed
+        current_delay_time += gamma_delay_time*(delay_time - current_delay_time);
+        float delayed_pos = (input_pos-(current_delay_time*sample_rate));
+        if (delayed_pos < 0) {
+            delayed_pos += buffer_size;
+        }
+        int x1 = (int)delayed_pos;
+        int x2 = (x1+1)%buffer_size;
+        float lam = x2-delayed_pos;
 
+        // get delayed signal name
         y1 = delay_line1[(x1+pos)%buffer_size];
         y2 = delay_line1[(x2+pos)%buffer_size];
         delay_signal = y2 + lam*(y1-y2);
-        //delay_signal = y1;
+        // calculate output with delay
         output[pos] = output_gain * (input[pos] * (1.-dry_wet_amount) + dry_wet_amount * delay_signal);
-        // output_gain
+        // calculate buffer position to store current input in
+        delay_pos_input = (pos + input_pos) % buffer_size;
+        // calculate delayed signal for buffer with feedback
         delay_line1[delay_pos_input] = input[pos] + feedback * output[pos];
     }
     input_pos += n_samples;
     input_pos %= buffer_size;
     delay->input_pos = input_pos;
-
+    delay->current_delay_time = current_delay_time;
 }
 
 static void
