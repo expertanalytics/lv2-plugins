@@ -131,7 +131,7 @@ run(LV2_Handle instance, uint32_t n_samples)
     int x2 = (x1+1)%buffer_size;
     float lam = x2-delayed_pos;
     const float dt2 = 0.000005 * (delay_time - current_delay_time)/fabs(delay_time - current_delay_time) ; //
-    const float dt = 0.5/n_samples * (delay_time - current_delay_time);
+    const float dt = 1./n_samples * (delay_time - current_delay_time);
 
     if (fabs(current_delay_time - delay_time) > 0.0001) {
         printf("Inside loop: delay time old: %f  - delay time new: %f - steps %f  - steps_in_one %f\n", current_delay_time, delay_time, dt2, dt);
