@@ -3,6 +3,7 @@
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix units: <http://lv2plug.in/ns/extensions/units#> .
+@prefix pprops: <http://lv2plug.in/ns/ext/port-props#> .
 
 <https://github.com/expertanalytics/lv2-plugins/tree/master/simple_delay>
     a lv2:Plugin ,
@@ -34,10 +35,11 @@
                     lv2:index 2 ;
                     lv2:symbol "s" ;
                     lv2:name "Delay time";
-                    lv2:default 0.2 ;
-                    lv2:minimum 0.0 ;
-                    lv2:maximum 1.0 ;
-                    units:unit units:s ;
+                    lv2:default 20.0 ;
+                    lv2:minimum 1.0 ;
+                    lv2:maximum 8000.0 ;
+                    lv2:portProperty pprops:logarithmic ;
+                    units:unit units:ms ;
                      ] , [
                     # feedback port
                     a lv2:InputPort ,

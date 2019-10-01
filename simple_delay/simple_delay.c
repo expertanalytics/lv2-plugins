@@ -32,6 +32,7 @@ typedef struct
     const float *feedback;
     const float *dry_wet_amount;
     const float *output_gain;
+    double rate;
 } SimpleDelay;
 
 static LV2_Handle
@@ -42,9 +43,10 @@ instantiate(const LV2_Descriptor *descriptor,
 {
     printf("instantiate\n");
     SimpleDelay *simple_delay = (SimpleDelay *)calloc(1, sizeof(SimpleDelay));
-    simple_delay->buffer_size = 22050 * 2;
+    simple_delay->buffer_size = rate * 8.0;
     simple_delay->delay_line1 = malloc(((int)simple_delay->buffer_size) * sizeof(float));
     simple_delay->input_pos = 0;
+    simple_delay->rate = rate;
 
     create_lookup_table(DB_C0); /* Create the lookup table */
 
@@ -66,16 +68,16 @@ connect_port(LV2_Handle instance,
         delay->output = (float *)data;
         break;
     case DELAY_TIME_PORT:
-        printf("Connect ports: index %d \n", port);
+        printf("Connect ports: index %u \n", port);
         delay->delay_time = (const float *)data;
     case FEEDBACK_PORT:
-        printf("Connect ports: index %d \n", port);
+        printf("Connect ports: index %u \n", port);
         delay->feedback = (const float *)data;
     case DRY_WET_PORT:
-        printf("Connect ports: index %d \n", port);
+        printf("Connect ports: index %u \n", port);
         delay->dry_wet_amount = (const float *)data;
     case OUTPUT_GAIN:
-        printf("Connect ports: index %d \n", port);
+        printf("Connect ports: index %u \n", port);
         delay->output_gain = (const float *)data;
     }
 }
@@ -105,6 +107,13 @@ run(LV2_Handle instance, uint32_t n_samples)
     float *const output = delay->output;
     int input_pos = delay->input_pos;
     long const buffer_size = delay->buffer_size;
+    const float delay_time = fabs(*(delay->delay_time)) / 1000.f; // ms
+
+    const float *const input = delay->input;
+    float *const delay_line1 = delay->delay_line1;
+    float *const output = delay->output;
+    int input_pos = delay->input_pos;
+    long const buffer_size = delay->buffer_size;
     const float delay_time = fabs(*(delay->delay_time)); // s
 
     const float dry_wet_amount = fabs(*(delay->dry_wet_amount) / 100.);
@@ -116,7 +125,7 @@ run(LV2_Handle instance, uint32_t n_samples)
     float delay_signal;
     float y1;
     float y2;
-    int sample_rate = 44100; // Hz
+    int sample_rate = (int)delay->rate; // Hz
 
     float delayed_pos = (input_pos - (delay_time * sample_rate));
     if (delayed_pos < 0)
