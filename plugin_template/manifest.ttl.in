@@ -1,7 +1,7 @@
 @prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-<https://github.com/expertanalytics/lv2-plugins/tree/master/foo>
+<https://github.com/expertanalytics/lv2-plugins/tree/master/plugin_name_placeholder>
         a lv2:Plugin ;
-        lv2:binary <foo@LIB_EXT@>  ;
-        rdfs:seeAlso <foo.ttl> .
+        lv2:binary <plugin_name_placeholder@LIB_EXT@>  ;
+        rdfs:seeAlso <plugin_name_placeholder.ttl> .
