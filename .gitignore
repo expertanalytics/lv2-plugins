@@ -1,4 +1,13 @@
+# python
 *.pyc
+
+# pycharm
+**/.idea*
+
+# cmake build folders
 *build/*
 */build/*
-**/.idea*
+*cmake-build-debug/*
+*/cmake-build-debug/*
+
+
