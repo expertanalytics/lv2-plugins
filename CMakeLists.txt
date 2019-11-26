@@ -23,3 +23,4 @@ message(STATUS "LV2_INCLUDE_DIRS: ${LV2_INCLUDE_DIRS}")
 message(STATUS "LV2_LIBRARY_DIRS: ${LV2_LIBRARY_DIR}")
 # Add subdirectories:
 add_subdirectory(simple_delay)
+add_subdirectory(lowpass)

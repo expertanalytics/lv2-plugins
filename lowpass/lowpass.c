@@ -7,7 +7,8 @@
 #include <stdio.h>
 
 #include "lv2/lv2plug.in/ns/lv2core/lv2.h"
-#define q "https://github.com/expertanalytics/lv2-plugins/tree/master/lowpass"
+#define LOWPASS_URI "https://github.com/expertanalytics/lv2-plugins/tree/master/lowpass"
+
 
 
 typedef enum {
@@ -36,8 +37,7 @@ instantiate(
     const LV2_Descriptor* descriptor,
     double                rate,
     const char*           bundle_path,
-    const LV2_Feature*
-    const* features,
+    const LV2_Feature* const* features
 ) {
     Lowpass* lowpass = (Lowpass*)malloc(sizeof(Lowpass));
 
@@ -54,7 +54,7 @@ static void
 connect_port(
     LV2_Handle instance,
     uint32_t   port,
-    void*      data,
+    void*      data
 ) {
     Lowpass* lowpass = (Lowpass*)instance;
 
@@ -78,8 +78,7 @@ static void
 activate(LV2_Handle instance) {
     Lowpass* lowpass = (Lowpass*)instance;
 
-    lowpass->alpha = 0.5 // b = 22050
-    lowpass-> = 0;
+    lowpass->alpha = 0.5; // b = 22050
     lowpass->transition_y = 0;
 }
 
@@ -95,13 +94,15 @@ run(LV2_Handle instance, uint32_t n_samples) {
     const float* const x = lowpass->input;
     float* const       y = lowpass->output;
 
-    y[0] = y0 + alpha * (x0 - y0);
+    // y[i] := α * x[i] + (1-α) * y[i-1]
+
+    y[0] = y0 + alpha * (x[0] - y0);
 
     for (uint32_t pos = 0; pos < n_samples-1; pos++) {
-        y[pos+1] = y[pos] + alpha * (x[pos] - y[pos]);
+        y[pos+1] = y[pos] + alpha * (x[pos+1] - y[pos]);
     }
 
-    lowpass->transition_y = y[n_samples-1] + alpha * (x[n_samples-1] - y[n_samples-1]);
+    lowpass->transition_y = y[n_samples-1];
 }
 
 /*
@@ -115,8 +116,7 @@ deactivate(LV2_Handle instance) {}
  */
 static void
 cleanup(LV2_Handle instance){
-    Lowpass* delay = (Lowpass*)instance;
-    free(lowpass->delay_line1);
+    Lowpass* lowpass = (Lowpass*)instance;
     free(lowpass);
 }
 
