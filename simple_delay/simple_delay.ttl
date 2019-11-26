@@ -8,6 +8,8 @@
 <https://github.com/expertanalytics/lv2-plugins/tree/master/simple_delay>
     a lv2:Plugin ,
         lv2:DelayPlugin ;
+        lv2:minorVersion lv2 ;
+        lv2:microVersion ;
 
         lv2:project <https://github.com/expertanalytics/lv2-plugins/tree/master/simple_delay> ;
 

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "lv2/lv2plug.in/ns/lv2core/lv2.h"
+#include <lv2/lv2plug.in/ns/lv2core/lv2.h>
 #define SIMPLE_DELAY_URI "https://github.com/expertanalytics/lv2-plugins/tree/master/simple_delay"
 
 
