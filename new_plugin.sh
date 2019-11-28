@@ -23,5 +23,4 @@ sed -i 's/\<TypeNamePlaceholder\>/'${pascal_var}'/g' ${base_folder}/${snake_var}
 sed -i 's/\<TypeNamePlaceholder\>/'${pascal_var}'/g' ${base_folder}/${snake_var}.ttl
 sed -i 's/\<plugin_name_placeholder\>/'${snake_var}'/g' ${base_folder}/${snake_var}.c
 sed -i 's/\<plugin_name_placeholder\>/'${snake_var}'/g' ${base_folder}/${snake_var}.ttl
-sed -i 's/\<plugin_name_placeholder\>/'${snake_var}'/g' ${base_folder}/manifest.ttl.in
-sed -i 's/\<plugin_name_placeholder\n>/'${snake_var}'/g' ${base_folder}/CMakeLists.txt
+#sed -i 's/\<plugin_name_placeholder\>/'${snake_var}'/g' ${base_folder}/manifest.ttl.in
