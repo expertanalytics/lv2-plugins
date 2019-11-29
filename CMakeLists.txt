@@ -31,7 +31,14 @@ message(STATUS "LV2_INCLUDE_DIRS: ${LV2_INCLUDE_DIRS}")
 message(STATUS "LV2_LIBRARY_DIRS: ${LV2_LIBRARY_DIR}")
 message(STATUS "LV2_LIBRARIES: ${LV2_LIBRARIES}")
 
+if(APPLE)
+        set(LIB_EXT "dylib")
+else()
+        set(LIB_EXT "so")
+endif()
 
+# Functions needed to build and install plugins
+include(${PROJECT_SOURCE_DIR}/build_support/add_plugin.cmake)
 # List of plugins:
-add_subdirectory(simple_delay)
+add_plugin(simple_delay)
 # END of list of plugins
