@@ -11,7 +11,6 @@ function(add_plugin plugin_name)
                         PREFIX ""
                         SUFFIC ".${LIB_EXT}"
                         VERSION "1.0")
-
         # And install:
         set(root ${LV2_INSTALL_DIR})
         # Then we install the turtle 
@@ -23,16 +22,8 @@ function(add_plugin plugin_name)
                         OUTPUT_FILE ${bundle}/manifest.ttl)
         install(DIRECTORY ${bundle} 
                 DESTINATION ${root})
-#install(CODE "execute_process(COMMAND deploy_turtle.sh -m ${plugin_name} dylib
-#               OUTPUT_FILE ${root}/manifest.ttl)")
-#execute_process(COMMAND ....
-#                        INPUT_FILE plugin_template/manifest.ttl.in
-#                        OUTPUT_FILE ${root}/manifest.ttl)
-        # TODO: The manifest file should add plugin_name appropriately and LIB_EXT suffix
-        #execute_process(COMMAND ....
-#                INPUT_FILE ${plugin_name}/${plugin_name}.ttl
-#                        OUTPUT_FILE ${root}/${plugin_name}.ttl)
-        # TODO: Process manifest.ttl.in file (basically a template)
-        # TODO: Process .ttl file (insert version)
-
+        install(FILES ${CMAKE_BINARY_DIR}/${bundle}/manifest.ttl
+                DESTINATION ${root}/${bundle})
+        install(TARGETS ${target}
+                DESTINATION ${root}/${bundle})
 endfunction()
