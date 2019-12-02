@@ -11,6 +11,7 @@ function(add_plugin plugin_name)
 
         set(source ${plugin_name}/${plugin_name}.c)
         set(target ${plugin_name})
+        set(turtle ${plugin_name}/${plugin_name}.ttl)
 
         add_library(${target} SHARED ${source})
         target_link_libraries(${target} PUBLIC ${LV2_LIBRARIES})
@@ -29,10 +30,9 @@ function(add_plugin plugin_name)
                         OUTPUT_FILE ${build_bundle}/manifest.ttl)
         # TODO: Make main turtle file:
 
-        # Install files:
-        install(DIRECTORY ${bundle} 
-                DESTINATION ${root})
         install(FILES ${build_bundle}/manifest.ttl
+                DESTINATION ${root}/${bundle})
+        install(FILES ${turtle}
                 DESTINATION ${root}/${bundle})
         install(TARGETS ${target}
                 DESTINATION ${root}/${bundle})
