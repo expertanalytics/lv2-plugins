@@ -10,10 +10,18 @@ ELSE()
 ENDIF()
 add_definitions(-Wall)
 
-
+set(CMAKE_INSTALL_PREFIX "")
 # Check for various libraries:
-find_package(PkgConfig)
-pkg_check_modules(LV2 lv2)
+find_package(PkgConfig REQUIRED)
+include(FindPkgConfig)
+pkg_check_modules(LV2
+                REQUIRED
+                lv2)
+if(LV2_FOUND)
+        message(STATUS "Found LV2")
+else()
+        message(STATUS "Didn't find LV2")
+endif()
 
 include_directories(${LV2_INCLUDE_DIRS})
 link_libraries(${LV2_LIBRARY_DIRS})
@@ -21,5 +29,16 @@ link_libraries(${LV2_LIBRARY_DIRS})
 message(STATUS "LV2_INSTALL_DIR:  ${LV2_INSTALL_DIR}")
 message(STATUS "LV2_INCLUDE_DIRS: ${LV2_INCLUDE_DIRS}")
 message(STATUS "LV2_LIBRARY_DIRS: ${LV2_LIBRARY_DIR}")
-# Add subdirectories:
-add_subdirectory(simple_delay)
+message(STATUS "LV2_LIBRARIES: ${LV2_LIBRARIES}")
+
+if(APPLE)
+        set(LIB_EXT "dylib")
+else()
+        set(LIB_EXT "so")
+endif()
+
+# Functions needed to build and install plugins
+include(${PROJECT_SOURCE_DIR}/build_support/add_plugin.cmake)
+# List of plugins:
+add_plugin(simple_delay)
+# END of list of plugins

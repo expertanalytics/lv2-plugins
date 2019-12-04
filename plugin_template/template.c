@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #include "lv2/lv2plug.in/ns/lv2core/lv2.h"
-#define q "https://github.com/expertanalytics/lv2-plugins/tree/master/plugin_name_placeholder"
+#define PLUGIN_NAME_PLACEHOLDER_URI "https://github.com/expertanalytics/lv2-plugins/tree/master/plugin_name_placeholder"
 
 
 typedef enum {
@@ -31,9 +31,7 @@ instantiate(
     const LV2_Descriptor* descriptor,
     double                rate,
     const char*           bundle_path,
-    const LV2_Feature*
-    const* features,
-)
+    const LV2_Feature* const* features)
 {
     TypeNamePlaceholder* plugin_name_placeholder = (TypeNamePlaceholder*)malloc(sizeof(plugin_name_placeholder));
 
@@ -98,7 +96,7 @@ extension_data(const char* uri)
 
 
 static const LV2_Descriptor descriptor = {
-        FOO_URI,
+        PLUGIN_NAME_PLACEHOLDER_URI,
         instantiate,
         connect_port,
         activate,
