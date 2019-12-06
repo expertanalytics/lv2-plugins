@@ -46,7 +46,7 @@ instantiate(const LV2_Descriptor*     descriptor,
     // printf("instantiate\n");
     SimpleDelay* simple_delay = (SimpleDelay*)calloc(1, sizeof(SimpleDelay));
     simple_delay->buffer_size = rate * 8.0;
-    simple_delay->delay_line1 = malloc(((int)simple_delay->buffer_size)*sizeof(float));
+    simple_delay->delay_line1 = (float*)malloc(((int)simple_delay->buffer_size)*sizeof(float));
     simple_delay->input_pos = 0;
     simple_delay->rate = rate;
     simple_delay->current_delay_time = 0.02;
@@ -189,8 +189,8 @@ LV2_SYMBOL_EXPORT
 const LV2_Descriptor*
 lv2_descriptor(uint32_t index)
 {
-switch (index) {
-case 0:  return &descriptor;
-default: return NULL;
+    switch (index) {
+        case 0:  return &descriptor;
+        default: return NULL;
 }
 }
