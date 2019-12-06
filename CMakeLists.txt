@@ -15,8 +15,8 @@ set(CMAKE_INSTALL_PREFIX "")
 find_package(PkgConfig REQUIRED)
 include(FindPkgConfig)
 pkg_check_modules(LV2
-                REQUIRED
-                lv2)
+        REQUIRED
+        lv2)
 if(LV2_FOUND)
         message(STATUS "Found LV2")
 else()

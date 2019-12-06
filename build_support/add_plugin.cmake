@@ -16,7 +16,7 @@ function(add_plugin plugin_name)
         # Get version:
         file(READ ${plugin_name}/version.txt
                 version)
-        string(STRIP ${version} version) # Strip trailing space-type characters
+        string(STRIP ${version} version)# Strip trailing space-type characters
         # Parse into major- and minor version
         string(REPLACE "." ";" vrs_list ${version})
         list(GET vrs_list 0 majV)
