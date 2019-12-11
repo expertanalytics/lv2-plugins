@@ -45,7 +45,7 @@ instantiate(const LV2_Descriptor*     descriptor,
 {
     // printf("instantiate\n");
     SimpleDelay* simple_delay = (SimpleDelay*)calloc(1, sizeof(SimpleDelay));
-    simple_delay->buffer_size = rate * 8.0;
+    simple_delay->buffer_size = rate * 8;
     simple_delay->delay_line1 = (float*)malloc(((int)simple_delay->buffer_size)*sizeof(float));
     simple_delay->input_pos = 0;
     simple_delay->rate = rate;
