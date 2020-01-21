@@ -5,6 +5,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <fftw3.h>
 
 #include "lv2/lv2plug.in/ns/lv2core/lv2.h"
 #define SIMPLE_LOWPASS_FFT_URI "https://github.com/expertanalytics/lv2-plugins/tree/master/simple_lowpass_fft"
@@ -18,8 +19,8 @@ typedef enum {
 
 typedef struct {
     // Port buffers
-    const float* input;
-    float*       output;
+    const float*  input;
+    float*        output;
 } SimpleLowpassFft;
 
 
@@ -34,7 +35,6 @@ instantiate(
     const LV2_Feature* const* features)
 {
     SimpleLowpassFft* simple_lowpass_fft = (SimpleLowpassFft*)malloc(sizeof(simple_lowpass_fft));
-
     return (LV2_Handle)simple_lowpass_fft;
 }
 
@@ -74,6 +74,44 @@ run(LV2_Handle instance, uint32_t n_samples) {
     const float* const x = simple_lowpass_fft->input;
     float* const       y = simple_lowpass_fft->output;
 
+    /*
+     * Forward transformation to fourier room
+     */
+    double* input = x;
+    double* y_dash = (double)malloc(sizeof(double * n_samples));
+    int n = (n_samples/2)+1;
+    fftw_complex* X = (fftw_complex*)fftw_alloc_complex(sizeof(fftw_complex * n);
+
+
+    fftw_plan input_to_F_plan = fftw_plan_dft_r2c_1d(n_samples, input, X);
+
+    fftw_execute(input_to_F_plan);
+    fftw_destroy_plan(input_to_F_plan);
+
+    /*
+     * Convolution with H == F(g)
+     */
+    for (uint32_t pos = 0; pos < n; pos++) {
+        X[pos] = X[pos] * H[pos];
+    }
+
+    /*
+     * Backward transformationn
+     */
+    fftw_plan output_to_f_plan = fftw_plan_dft_c2r_1d(n_samples, X, y_dash);
+
+    fftw_execute(output_to_f_plan);
+    fftw_destroy_plan(output_to_f_plan);
+
+    for (uint32_t pos = 0; pos < n_samples; pos++) {
+        y[pos] = y_dash[pos];
+    }
+
+    /*
+     * Free memory
+     */
+    fftw_free(X)
+    fftw_free(y_dash)
 }
 
 /*

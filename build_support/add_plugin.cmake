@@ -24,7 +24,8 @@ function(add_plugin plugin_name)
         
         # Add and link library
         add_library(${target} SHARED ${source})
-        target_link_libraries(${target} PUBLIC ${LV2_LIBRARIES})
+        find_library(fftw3 REQUIRED)
+        target_link_libraries(${target} PUBLIC ${LV2_LIBRARIES} fftw3)
         set_target_properties(${target} PROPERTIES 
                         PREFIX ""
                         SUFFIC ".${LIB_EXT}"
