@@ -42,4 +42,5 @@ include(${PROJECT_SOURCE_DIR}/build_support/add_plugin.cmake)
 # List of plugins:
 add_plugin(simple_delay)
 add_plugin(lowpass)
+add_plugin(simple_lowpass_fft)
 # END of list of plugins

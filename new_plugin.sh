@@ -19,13 +19,13 @@ cp plugin_template/{template.ttl,template.c,version.txt}  ${base_folder}
 mv ${base_folder}/template.ttl ${base_folder}/${snake_var}.ttl
 mv ${base_folder}/template.c ${base_folder}/${snake_var}.c
 
-sed -i '' 's/\<TypeNamePlaceholder\>/'${pascal_var}'/g' ${base_folder}/${snake_var}.c
-sed -i '' 's/\<TypeNamePlaceholder\>/'${pascal_var}'/g' ${base_folder}/${snake_var}.ttl
-sed -i '' 's/plugin_name_placeholder/'${snake_var}'/g' ${base_folder}/${snake_var}.c
-sed -i '' 's/plugin_name_placeholder/'${snake_var}'/g' ${base_folder}/${snake_var}.ttl
-sed -i '' 's/PLUGIN_NAME_PLACEHOLDER/'${snake_var^^}'/g' ${base_folder}/${snake_var}.c
+sed -i 's/\<TypeNamePlaceholder\>/'${pascal_var}'/g' ${base_folder}/${snake_var}.c
+sed -i 's/\<TypeNamePlaceholder\>/'${pascal_var}'/g' ${base_folder}/${snake_var}.ttl
+sed -i 's/plugin_name_placeholder/'${snake_var}'/g' ${base_folder}/${snake_var}.c
+sed -i 's/plugin_name_placeholder/'${snake_var}'/g' ${base_folder}/${snake_var}.ttl
+sed -i 's/PLUGIN_NAME_PLACEHOLDER/'${snake_var^^}'/g' ${base_folder}/${snake_var}.c
 
 # Add line to CMakeLists.txt
-sed -i '' '/^\# END of list of plugins/i\
-            add_plugin\('${snake_var}'\)
+sed -i '/^\# END of list of plugins/i\
+add_plugin\('${snake_var}'\)
 ' CMakeLists.txt
