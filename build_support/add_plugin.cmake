@@ -12,11 +12,13 @@ function(add_plugin plugin_name)
         set(source ${plugin_name}/${plugin_name}.c)
         set(target ${plugin_name})
         set(turtle ${plugin_name}/${plugin_name}.ttl)
+        set(manifest ${plugin_name}/manifest.ttl)
 
         # Get version:
         file(READ ${plugin_name}/version.txt
                 version)
-        string(STRIP ${version} version) # Strip trailing space-type characters
+        message(STATUS "Version is ${version}")
+        string(STRIP ${version} version) # Strip trailing whitespaces
         # Parse into major- and minor version
         string(REPLACE "." ";" vrs_list ${version})
         list(GET vrs_list 0 majV)
@@ -30,23 +32,16 @@ function(add_plugin plugin_name)
                         SUFFIC ".${LIB_EXT}"
                         VERSION ${version}
                         LIBRARY_OUTPUT_DIRECTORY ${build_bundle})
-        # Then we install the turtle files
-        # Make manifest file:
-        execute_process(COMMAND bash "-c" 
-                       "cat ${PROJECT_SOURCE_DIR}/plugin_template/manifest.ttl.in | 
-                        sed 's/@PLUGIN_NAME@/${plugin_name}/g;s/\@LIB_EXT\@/${LIB_EXT}/g'"
-                        OUTPUT_FILE ${build_bundle}/manifest.ttl)
-        
         # Make main turtle file
         execute_process(COMMAND bash "-c"
                         "cat ${PROJECT_SOURCE_DIR}/${turtle} |
                         sed 's/@VERSION@/lv2:minorVersion ${majV} ;\\\n\
-        lv2:microVersion ${minV} ; /g'"
+                        lv2:microVersion ${minV} ; /g'"
                         OUTPUT_FILE ${build_bundle}/${plugin_name}.ttl)
 
         # And install:
         set(root ${LV2_INSTALL_DIR})
-        install(FILES ${build_bundle}/manifest.ttl
+        install(FILES ${manifest}
                 DESTINATION ${root}/${bundle})
         install(FILES ${build_bundle}/${plugin_name}.ttl
                 DESTINATION ${root}/${bundle})
