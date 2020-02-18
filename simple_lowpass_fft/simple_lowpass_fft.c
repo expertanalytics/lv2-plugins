@@ -69,7 +69,7 @@ activate(LV2_Handle instance) {}
  */
 static void
 run(LV2_Handle instance, uint32_t n_samples) {
-    Lowpass* simple_lowpass_fft = (Lowpass*)instance;
+    SimpleLowpassFft* simple_lowpass_fft = (SimpleLowpassFft*)instance;
 
     const float* const x = simple_lowpass_fft->input;
     float* const       y = simple_lowpass_fft->output;
@@ -77,10 +77,10 @@ run(LV2_Handle instance, uint32_t n_samples) {
     /*
      * Forward transformation to fourier room
      */
-    double* input = x;
-    double* y_dash = (double)malloc(sizeof(double * n_samples));
+    const float* const input = x;
+    double* y_dash = (double*)malloc(sizeof(double)*n_samples);
     int n = (n_samples/2)+1;
-    fftw_complex* X = (fftw_complex*)fftw_alloc_complex(sizeof(fftw_complex * n);
+    fftw_complex* X = (fftw_complex*)fftw_alloc_complex(sizeof(fftw_complex) * n));
 
 
     fftw_plan input_to_F_plan = fftw_plan_dft_r2c_1d(n_samples, input, X);
