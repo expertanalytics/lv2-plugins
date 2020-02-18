@@ -113,7 +113,6 @@ run(LV2_Handle instance, uint32_t n_samples) {
          */
         y[pos] = y_dash[pos]/n_samples;
     }
-//    printf("%f \n",y[0]/input[0]);
     /*
      * Free memory
      */
