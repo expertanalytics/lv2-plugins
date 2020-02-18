@@ -110,8 +110,8 @@ run(LV2_Handle instance, uint32_t n_samples) {
     /*
      * Free memory
      */
-    fftw_free(X)
-    fftw_free(y_dash)
+    fftw_free(X);
+    fftw_free(y_dash);
 }
 
 /*
