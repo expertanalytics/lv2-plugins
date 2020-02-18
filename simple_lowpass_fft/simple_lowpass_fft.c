@@ -104,14 +104,18 @@ run(LV2_Handle instance, uint32_t n_samples) {
      *
      */
 
+    float lowpass_freq = 2000; // cutoff filter freq in Hz
+    lowpass_freq /= ((simple_lowpass_fft->sampling_rate/2) / n);
+    
+
     for (uint32_t pos = 0; pos < n; pos++) {
 //        printf("%f %f \n", creal(X[pos]), cimag(X[pos]));
 
         if (pos == 0){
             X[pos] = X[pos]*0.0;
         }
-        if (pos < 100){
-        X[pos] = X[pos] * (1.0-pos/100.);
+        if (pos <= lowpass_freq){
+        X[pos] = X[pos] * 1.0;
         }
         else {
         X[pos] = X[pos] * 0.0;
