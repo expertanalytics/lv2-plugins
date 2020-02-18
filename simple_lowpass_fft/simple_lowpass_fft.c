@@ -77,13 +77,17 @@ run(LV2_Handle instance, uint32_t n_samples) {
     /*
      * Forward transformation to fourier room
      */
-    const float* const input = x;
+    double* input = (double*)malloc(sizeof(double)*n_samples);
+    for (uint32_t pos = 0; pos < n_samples; pos++) {
+        input[pos] = x[pos];
+    }
+
     double* y_dash = (double*)malloc(sizeof(double)*n_samples);
     int n = (n_samples/2)+1;
-    fftw_complex* X = (fftw_complex*)fftw_alloc_complex(sizeof(fftw_complex) * n));
+    fftw_complex* X = (fftw_complex*)fftw_alloc_complex(sizeof(fftw_complex) * n);
 
 
-    fftw_plan input_to_F_plan = fftw_plan_dft_r2c_1d(n_samples, input, X);
+    fftw_plan input_to_F_plan = fftw_plan_dft_r2c_1d(n_samples, input, X, FFTW_FORWARD);
 
     fftw_execute(input_to_F_plan);
     fftw_destroy_plan(input_to_F_plan);
@@ -91,14 +95,14 @@ run(LV2_Handle instance, uint32_t n_samples) {
     /*
      * Convolution with H == F(g)
      */
-    for (uint32_t pos = 0; pos < n; pos++) {
-        X[pos] = X[pos] * H[pos];
-    }
+//    for (uint32_t pos = 0; pos < n; pos++) {
+//        X[pos] = X[pos] * 1.0;
+//    }
 
     /*
      * Backward transformationn
      */
-    fftw_plan output_to_f_plan = fftw_plan_dft_c2r_1d(n_samples, X, y_dash);
+    fftw_plan output_to_f_plan = fftw_plan_dft_c2r_1d(n_samples, X, y_dash, FFTW_BACKWARD);
 
     fftw_execute(output_to_f_plan);
     fftw_destroy_plan(output_to_f_plan);
