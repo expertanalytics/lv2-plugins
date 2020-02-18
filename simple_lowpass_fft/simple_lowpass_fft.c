@@ -5,6 +5,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <complex.h>
 #include <fftw3.h>
 
 #include "lv2/lv2plug.in/ns/lv2core/lv2.h"
@@ -21,6 +22,7 @@ typedef struct {
     // Port buffers
     const float*  input;
     float*        output;
+    double        sampling_rate;
 } SimpleLowpassFft;
 
 
@@ -35,6 +37,7 @@ instantiate(
     const LV2_Feature* const* features)
 {
     SimpleLowpassFft* simple_lowpass_fft = (SimpleLowpassFft*)malloc(sizeof(SimpleLowpassFft));
+    simple_lowpass_fft->sampling_rate = rate;
     return (LV2_Handle)simple_lowpass_fft;
 }
 
@@ -95,9 +98,25 @@ run(LV2_Handle instance, uint32_t n_samples) {
     /*
      * Convolution with H == F(g)
      */
-//    for (uint32_t pos = 0; pos < n; pos++) {
-//        X[pos] = X[pos] * 1.0;
-//    }
+    /*
+     * pos 0 has 0 in imainary part = is the integral of all freq.
+     * Last value in X is nyquist freq.
+     *
+     */
+
+    for (uint32_t pos = 0; pos < n; pos++) {
+//        printf("%f %f \n", creal(X[pos]), cimag(X[pos]));
+
+        if (pos == 0){
+            X[pos] = X[pos]*0.0;
+        }
+        if (pos < 100){
+        X[pos] = X[pos] * (1.0-pos/100.);
+        }
+        else {
+        X[pos] = X[pos] * 0.0;
+        }
+    }
 
     /*
      * Backward transformationn
