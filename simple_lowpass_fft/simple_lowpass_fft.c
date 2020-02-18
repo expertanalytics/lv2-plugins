@@ -34,7 +34,7 @@ instantiate(
     const char*           bundle_path,
     const LV2_Feature* const* features)
 {
-    SimpleLowpassFft* simple_lowpass_fft = (SimpleLowpassFft*)malloc(sizeof(simple_lowpass_fft));
+    SimpleLowpassFft* simple_lowpass_fft = (SimpleLowpassFft*)malloc(sizeof(SimpleLowpassFft));
     return (LV2_Handle)simple_lowpass_fft;
 }
 
@@ -87,7 +87,7 @@ run(LV2_Handle instance, uint32_t n_samples) {
     fftw_complex* X = (fftw_complex*)fftw_alloc_complex(sizeof(fftw_complex) * n);
 
 
-    fftw_plan input_to_F_plan = fftw_plan_dft_r2c_1d(n_samples, input, X, FFTW_FORWARD);
+    fftw_plan input_to_F_plan = fftw_plan_dft_r2c_1d(n_samples, input, X, FFTW_ESTIMATE);
 
     fftw_execute(input_to_F_plan);
     fftw_destroy_plan(input_to_F_plan);
@@ -102,7 +102,7 @@ run(LV2_Handle instance, uint32_t n_samples) {
     /*
      * Backward transformationn
      */
-    fftw_plan output_to_f_plan = fftw_plan_dft_c2r_1d(n_samples, X, y_dash, FFTW_BACKWARD);
+    fftw_plan output_to_f_plan = fftw_plan_dft_c2r_1d(n_samples, X, y_dash, FFTW_ESTIMATE);
 
     fftw_execute(output_to_f_plan);
     fftw_destroy_plan(output_to_f_plan);
