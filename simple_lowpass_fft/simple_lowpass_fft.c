@@ -108,9 +108,12 @@ run(LV2_Handle instance, uint32_t n_samples) {
     fftw_destroy_plan(output_to_f_plan);
 
     for (uint32_t pos = 0; pos < n_samples; pos++) {
-        y[pos] = y_dash[pos];
+        /*
+         * normalize output by number of samples to take account of 2 ffts
+         */
+        y[pos] = y_dash[pos]/n_samples;
     }
-
+//    printf("%f \n",y[0]/input[0]);
     /*
      * Free memory
      */
